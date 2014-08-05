@@ -121,7 +121,7 @@ int main(int argc, char **argv)
 				break;
 			case 'h':
 			default:
-				printf("usage: %s [-f file.bin -d dest_addr -t kernel/bootlogo/binload [-i arcindex]] [-h]\n", argv[0]);
+				fprintf(stderr, "usage: %s [-h] [-f <input file> -d <load address> -t [kernel|bootlogo|binload|arc] [-i <arc index>]] ...\n", argv[0]);
 				return 1;
 		}
 	}
