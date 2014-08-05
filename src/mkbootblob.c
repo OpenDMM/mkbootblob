@@ -37,7 +37,7 @@ static bool get_filelength(char *filename, off_t *len)
 static bool validate_list(void)
 {
 	struct list_entry *element;
-	char *type_lut[] = {"none", "kernel ", " logo  ", "binload", "", "", "", "", "  arc  "};
+	const char *type_lut[] = {"none", "kernel ", " logo  ", "binload", "", "", "", "", "  arc  "};
 	static uint32_t lba_pos = 1;	//first block is for content-list
 
 	if (entire_list == NULL) {
