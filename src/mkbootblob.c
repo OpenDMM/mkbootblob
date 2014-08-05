@@ -41,7 +41,7 @@ static bool validate_list(void)
 	static uint32_t lba_pos = 1;	//first block is for content-list
 
 	if (entire_list == NULL) {
-		printf("no elements given!\n");
+		fprintf(stderr, "no elements given!\n");
 		return false;
 	}
 
@@ -53,7 +53,7 @@ static bool validate_list(void)
 		off_t filelen;
 	
 		if (!get_filelength(element->filename, &filelen)) {
-			printf("cannot get size of %s\n", element->filename);
+			fprintf(stderr, "cannot get size of %s\n", element->filename);
 			return false;
 		}
 
@@ -123,7 +123,7 @@ int main(int argc, char **argv)
 	}
 
 	if (!validate_list()) {
-		printf("vaildation of elements failed\n");
+		fprintf(stderr, "vaildation of elements failed\n");
 		return 1;
 	}
 
@@ -163,7 +163,7 @@ int main(int argc, char **argv)
 
 		ifd = open(element->filename, O_RDONLY);
 		if(ifd <= 0) {
-			printf("cannot open %s\n", element->filename);
+			fprintf(stderr, "cannot open %s\n", element->filename);
 			return 1;
 		}
 
