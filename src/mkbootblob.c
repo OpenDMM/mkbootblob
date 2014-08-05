@@ -23,7 +23,7 @@ struct list_entry {
 
 static struct list_entry *entire_list;
 
-static bool get_filelength(char *filename, uint32_t *len)
+static bool get_filelength(char *filename, off_t *len)
 {
 	struct stat st;
 
@@ -50,7 +50,7 @@ static bool validate_list(void)
 	printf("-------------------------------------------------------------------\n");
 
 	for (element = entire_list; element != NULL; element = element->next) {
-		uint32_t filelen;
+		off_t filelen;
 	
 		if (!get_filelength(element->filename, &filelen)) {
 			printf("cannot get size of %s\n", element->filename);
@@ -61,6 +61,7 @@ static bool validate_list(void)
 		filelen = (filelen + 4095) & ~4095;
 
 		element->image_len = filelen;
+		assert(element->image_len == filelen);	// may fail with huge files
 		element->lba_pos = lba_pos;
 		element->lba_len = (filelen + 512) / 512;
 
