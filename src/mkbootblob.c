@@ -91,7 +91,7 @@ int main(int argc, char **argv)
 	uint32_t wp;
 	
 
-	while((c = getopt(argc, argv, "f:d:t:i:h")) != -1) {
+	while ((c = getopt(argc, argv, "d:f:hi:t:")) != -1) {
 		switch(c) {
 			case 'f':
 				last_element = element;
