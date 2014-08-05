@@ -93,6 +93,9 @@ int main(int argc, char **argv)
 
 	while ((c = getopt(argc, argv, "d:f:hi:t:")) != -1) {
 		switch(c) {
+			case 'd':
+				element->dest_addr = strtol(optarg, NULL, 16);
+				break;
 			case 'f':
 				last_element = element;
 				element = malloc(sizeof(struct list_entry));
@@ -103,8 +106,8 @@ int main(int argc, char **argv)
 					last_element->next = element;
 				strncpy(element->filename, optarg, FILENAME_MAX);
 				break;
-			case 'd':
-				element->dest_addr = strtol(optarg, NULL, 16);
+			case 'i':
+				element->arc_index = strtol(optarg, NULL, 16);
 				break;
 			case 't':
 				if(!strcmp(optarg, "kernel"))
@@ -115,9 +118,6 @@ int main(int argc, char **argv)
 					element->type = 3;
 				else if(!strcmp(optarg, "arc"))
 					element->type = 8;
-				break;
-			case 'i':
-				element->arc_index = strtol(optarg, NULL, 16);
 				break;
 			case 'h':
 			default:
