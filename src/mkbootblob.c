@@ -9,10 +9,8 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-#define MAX_FILENAME 255
-
 struct list_entry {
-	char filename[MAX_FILENAME];
+	char filename[FILENAME_MAX];
 	uint32_t image_len;
 	uint32_t dest_addr;
 	uint32_t lba_pos;
@@ -97,7 +95,7 @@ int main(int argc, char **argv)
 					entire_list = element;
 				else
 					last_element->next = element;
-				strncpy(element->filename, optarg, MAX_FILENAME);
+				strncpy(element->filename, optarg, FILENAME_MAX);
 				break;
 			case 'd':
 				element->dest_addr = strtol(optarg, NULL, 16);
