@@ -1,0 +1,16 @@
+.deps/
+Makefile
+Makefile.in
+aclocal.m4
+autom4te.cache/
+compile
+config.log
+config.status
+configure
+depcomp
+install-sh
+missing
+mkbootblob_config.h
+mkbootblob_config.h.in
+stamp-h1
+*.o
