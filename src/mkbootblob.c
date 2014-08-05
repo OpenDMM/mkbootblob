@@ -75,7 +75,7 @@ static int validate_list(void)
 
 int main(int argc, char **argv)
 {
-	struct list_entry *element, *last_element;
+	struct list_entry *element = NULL, *last_element;
 	int c;
 	int ofd;
 
