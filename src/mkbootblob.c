@@ -1,6 +1,7 @@
 #include <assert.h>
 #include <errno.h>
 #include <fcntl.h>
+#include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -22,18 +23,18 @@ struct list_entry {
 
 static struct list_entry *entire_list;
 
-static int get_filelength(char *filename, uint32_t *len)
+static bool get_filelength(char *filename, uint32_t *len)
 {
 	struct stat st;
 
 	if(stat(filename, &st) != 0)
-		return -1;
+		return false;
 
 	*len = st.st_size;
-	return 0;
+	return true;
 }
 
-static int validate_list(void)
+static bool validate_list(void)
 {
 	struct list_entry *element;
 	char *type_lut[] = {"none", "kernel ", " logo  ", "binload", "", "", "", "", "  arc  "};
@@ -41,7 +42,7 @@ static int validate_list(void)
 
 	if (entire_list == NULL) {
 		printf("no elements given!\n");
-		return -1;
+		return false;
 	}
 
 	printf("\n");
@@ -51,9 +52,9 @@ static int validate_list(void)
 	for (element = entire_list; element != NULL; element = element->next) {
 		uint32_t filelen;
 	
-		if(get_filelength(element->filename, &filelen)) {
+		if (!get_filelength(element->filename, &filelen)) {
 			printf("cannot get size of %s\n", element->filename);
-			return -1;
+			return false;
 		}
 
 		/* we need 4K blocks! */
@@ -69,7 +70,7 @@ static int validate_list(void)
 	}
 	printf("\n");
 
-	return 0;
+	return true;
 }
 
 
@@ -120,7 +121,7 @@ int main(int argc, char **argv)
 		}
 	}
 
-	if(validate_list()) {
+	if (!validate_list()) {
 		printf("vaildation of elements failed\n");
 		return 1;
 	}
