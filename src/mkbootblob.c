@@ -1,4 +1,5 @@
 #include <assert.h>
+#include <errno.h>
 #include <stdio.h>
 #include <stdint.h>
 #include <unistd.h>
@@ -80,6 +81,7 @@ int main(int argc, char **argv)
 	int c;
 	int ofd;
 
+	const char *output_filename = "out.bin";
 	unsigned char block[512];
 	uint32_t *block32 = (uint32_t *)block;
 	uint32_t wp;
@@ -128,8 +130,6 @@ int main(int argc, char **argv)
 
 	/* now compose the data */
 
-	ofd = open("out.bin", O_CREAT|O_WRONLY, S_IRWXU);
-
 	/* create the content list */
 	memset(block, 0, sizeof(block));
 
@@ -143,6 +143,13 @@ int main(int argc, char **argv)
 			block32[wp++] = element->type + element->arc_index;
 		else
 			block32[wp++] = element->type;
+	}
+
+	ofd = open(output_filename, O_CREAT | O_WRONLY, S_IRWXU);
+	if (ofd < 0) {
+		fprintf(stderr, "Could not open %s for writing. %s\n",
+			output_filename, strerror(errno));
+		return 1;
 	}
 
 	if (write(ofd, block, 512) != 512) {
