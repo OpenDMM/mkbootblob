@@ -1,3 +1,4 @@
+#include <assert.h>
 #include <stdio.h>
 #include <stdint.h>
 #include <unistd.h>
@@ -134,6 +135,7 @@ int main(int argc, char **argv)
 
 	wp = 0;
 	for (element = entire_list; element != NULL; element = element->next) {
+		assert(wp * 4 < 512);
 		block32[wp++] = element->image_len;
 		block32[wp++] = element->lba_pos;
 		block32[wp++] = element->dest_addr;
