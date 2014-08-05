@@ -91,7 +91,7 @@ int main(int argc, char **argv)
 	uint32_t wp;
 	
 
-	while ((c = getopt(argc, argv, "d:f:hi:t:")) != -1) {
+	while ((c = getopt(argc, argv, "d:f:hi:o:t:")) != -1) {
 		switch(c) {
 			case 'd':
 				element->dest_addr = strtol(optarg, NULL, 16);
@@ -109,6 +109,9 @@ int main(int argc, char **argv)
 			case 'i':
 				element->arc_index = strtol(optarg, NULL, 16);
 				break;
+			case 'o':
+				output_filename = optarg;
+				break;
 			case 't':
 				if(!strcmp(optarg, "kernel"))
 					element->type = 1;
@@ -121,7 +124,7 @@ int main(int argc, char **argv)
 				break;
 			case 'h':
 			default:
-				fprintf(stderr, "usage: %s [-h] [-f <input file> -d <load address> -t [kernel|bootlogo|binload|arc] [-i <arc index>]] ...\n", argv[0]);
+				fprintf(stderr, "usage: %s [-h] [-o <output file>] [-f <input file> -d <load address> -t [kernel|bootlogo|binload|arc] [-i <arc index>]] ...\n", argv[0]);
 				return 1;
 		}
 	}
