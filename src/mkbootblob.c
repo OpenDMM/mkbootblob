@@ -80,6 +80,7 @@ int main(int argc, char **argv)
 	int ofd;
 
 	unsigned char block[512];
+	uint32_t *block32 = (uint32_t *)block;
 	uint32_t wp;
 	
 
@@ -132,21 +133,14 @@ int main(int argc, char **argv)
 	memset(block, 0, sizeof(block));
 
 	wp = 0;
-
 	for (element = entire_list; element != NULL; element = element->next) {
-		*(uint32_t *)&block[wp] = element->image_len;
-		wp += 4;
-		*(uint32_t *)&block[wp] = element->lba_pos;
-		wp += 4;
-		*(uint32_t *)&block[wp] = element->dest_addr;
-		wp += 4;
-
-		if(element->type == 8)
-			*(uint32_t *)&block[wp] = element->type + element->arc_index;
+		block32[wp++] = element->image_len;
+		block32[wp++] = element->lba_pos;
+		block32[wp++] = element->dest_addr;
+		if (element->type == 8)
+			block32[wp++] = element->type + element->arc_index;
 		else
-			*(uint32_t *)&block[wp] = element->type;
-
-		wp += 4;
+			block32[wp++] = element->type;
 	}
 
 	write(ofd, block, 512);
