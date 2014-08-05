@@ -143,7 +143,10 @@ int main(int argc, char **argv)
 			block32[wp++] = element->type;
 	}
 
-	write(ofd, block, 512);
+	if (write(ofd, block, 512) != 512) {
+		fprintf(stderr, "write() failed.\n");
+		return 1;
+	}
 
 	for (element = entire_list; element != NULL; element = element->next) {
 		uint32_t lba;
@@ -162,7 +165,10 @@ int main(int argc, char **argv)
 					rlen = 0;
 				memset(&block[rlen], 0, 512-rlen);
 			}
-			write(ofd, block, 512);
+			if (write(ofd, block, 512) != 512) {
+				fprintf(stderr, "write() failed.\n");
+				return 1;
+			}
 		}
 
 		close(ifd);
