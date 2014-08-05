@@ -57,8 +57,8 @@ static int validate_list(void)
 			return -1;
 		}
 
-		if(filelen < 4096)	/* loader expects 4096 bytes aligned */
-			filelen = 4096;
+		/* we need 4K blocks! */
+		filelen = (filelen + 4095) & ~4095;
 
 		element->image_len = filelen;
 		element->lba_pos = lba_pos;
@@ -174,6 +174,8 @@ int main(int argc, char **argv)
 		for(lba = 0; lba < element->lba_len; lba++) {
 			int rlen = read(ifd, block, 512);
 			if(rlen < 512) {
+				if (rlen < 0)
+					rlen = 0;
 				memset(&block[rlen], 0, 512-rlen);
 			}
 			write(ofd, block, 512);
