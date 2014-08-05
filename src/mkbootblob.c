@@ -118,13 +118,13 @@ int main(int argc, char **argv)
 			case 'h':
 			default:
 				printf("usage: %s [-f file.bin -d dest_addr -t kernel/bootlogo/binload [-i arcindex]] [-h]\n", argv[0]);
-				return -1;
+				return 1;
 		}
 	}
 
 	if(validate_list()) {
 		printf("vaildation of elements failed\n");
-		return -1;
+		return 1;
 	}
 
 
@@ -164,7 +164,7 @@ int main(int argc, char **argv)
 		ifd = open(element->filename, O_RDONLY);
 		if(ifd <= 0) {
 			printf("cannot open %s\n", element->filename);
-			return -1;
+			return 1;
 		}
 
 		for(lba = 0; lba < element->lba_len; lba++) {
