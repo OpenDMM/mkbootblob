@@ -35,11 +35,11 @@ static int get_filelength(char *filename, uint32_t *len)
 
 static int validate_list(void)
 {
-	struct list_entry *element = entire_list;
+	struct list_entry *element;
 	char *type_lut[] = {"none", "kernel ", " logo  ", "binload", "", "", "", "", "  arc  "};
 	static uint32_t lba_pos = 1;	//first block is for content-list
 
-	if(!element) {
+	if (entire_list == NULL) {
 		printf("no elements given!\n");
 		return -1;
 	}
@@ -48,8 +48,7 @@ static int validate_list(void)
 	printf("destination |    size    |  lba-pos | lba-len |  type   | filename\n");
 	printf("-------------------------------------------------------------------\n");
 
-	while(1)
-	{
+	for (element = entire_list; element != NULL; element = element->next) {
 		uint32_t filelen;
 	
 		if(get_filelength(element->filename, &filelen)) {
@@ -67,9 +66,6 @@ static int validate_list(void)
 		lba_pos += element->lba_len;
 
 		printf(" 0x%08x | %10d | %8d | %7d | %s | %s\n", element->dest_addr, element->image_len, element->lba_pos, element->lba_len, type_lut[element->type], element->filename);
-		element = element->next;
-		if(!element)
-			break;
 	}
 	printf("\n");
 
@@ -135,10 +131,9 @@ int main(int argc, char **argv)
 	/* create the content list */
 	memset(block, 0, sizeof(block));
 
-	element = entire_list;
 	wp = 0;
 
-	while(1) {
+	for (element = entire_list; element != NULL; element = element->next) {
 		*(uint32_t *)&block[wp] = element->image_len;
 		wp += 4;
 		*(uint32_t *)&block[wp] = element->lba_pos;
@@ -152,16 +147,11 @@ int main(int argc, char **argv)
 			*(uint32_t *)&block[wp] = element->type;
 
 		wp += 4;
-		element = element->next;
-		if(!element)
-			break;
 	}
 
 	write(ofd, block, 512);
 
-	element = entire_list;
-
-	while(1) {
+	for (element = entire_list; element != NULL; element = element->next) {
 		uint32_t lba;
 		int ifd;
 
@@ -182,10 +172,6 @@ int main(int argc, char **argv)
 		}
 
 		close(ifd);
-
-		element = element->next;
-		if(!element)
-			break;
 	}
 
 	close(ofd);
