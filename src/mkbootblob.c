@@ -10,6 +10,8 @@
 #include <sys/types.h>
 #include <unistd.h>
 
+#define ARRAY_SIZE(x)	(sizeof((x)) / sizeof(*(x)))
+
 struct list_entry {
 	char filename[FILENAME_MAX];
 	uint32_t image_len;
@@ -52,6 +54,8 @@ static bool validate_list(void)
 	for (element = entire_list; element != NULL; element = element->next) {
 		off_t filelen;
 	
+		assert(element->type < ARRAY_SIZE(type_lut));
+
 		if (!get_filelength(element->filename, &filelen)) {
 			fprintf(stderr, "cannot get size of %s\n", element->filename);
 			return false;
