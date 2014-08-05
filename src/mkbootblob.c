@@ -63,7 +63,7 @@ static bool validate_list(void)
 		element->image_len = filelen;
 		assert(element->image_len == filelen);	// may fail with huge files
 		element->lba_pos = lba_pos;
-		element->lba_len = (filelen + 512) / 512;
+		element->lba_len = filelen / 512;
 
 		lba_pos += element->lba_len;
 
