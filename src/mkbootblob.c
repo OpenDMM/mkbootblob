@@ -39,7 +39,7 @@ static bool get_filelength(char *filename, off_t *len)
 static bool validate_list(void)
 {
 	struct list_entry *element;
-	const char *type_lut[] = {"none", "kernel ", " logo  ", "binload", "", "", "", "", "  arc  "};
+	const char *type_lut[] = {"", "kernel ", " logo  ", "binload", "initrd ", "cmdline", "", "", "  arc  "};
 	static uint32_t lba_pos = 1;	//first block is for content-list
 
 	if (entire_list == NULL) {
@@ -55,6 +55,10 @@ static bool validate_list(void)
 		off_t filelen;
 	
 		assert(element->type < ARRAY_SIZE(type_lut));
+		if (strlen(type_lut[element->type]) == 0) {
+			fprintf(stderr, "invalid element type %d\n", element->type);
+			return false;
+		}
 
 		if (!get_filelength(element->filename, &filelen)) {
 			fprintf(stderr, "cannot get size of %s\n", element->filename);
@@ -99,7 +103,7 @@ int main(int argc, char **argv)
 			case 'f':
 				last_element = element;
 				element = malloc(sizeof(struct list_entry));
-				element->next = 0;
+				memset(element, 0, sizeof(struct list_entry));
 				if(!entire_list)
 					entire_list = element;
 				else
@@ -113,18 +117,22 @@ int main(int argc, char **argv)
 				output_filename = optarg;
 				break;
 			case 't':
-				if(!strcmp(optarg, "kernel"))
+				if (!strcmp(optarg, "kernel"))
 					element->type = 1;
-				else if(!strcmp(optarg, "bootlogo"))
+				else if (!strcmp(optarg, "bootlogo"))
 					element->type = 2;
-				else if(!strcmp(optarg, "binload"))
+				else if (!strcmp(optarg, "binload"))
 					element->type = 3;
-				else if(!strcmp(optarg, "arc"))
+				else if (!strcmp(optarg, "initrd"))
+					element->type = 4;
+				else if (!strcmp(optarg, "cmdline"))
+					element->type = 5;
+				else if (!strcmp(optarg, "arc"))
 					element->type = 8;
 				break;
 			case 'h':
 			default:
-				fprintf(stderr, "usage: %s [-h] [-o <output file>] [-f <input file> -d <load address> -t [kernel|bootlogo|binload|arc] [-i <arc index>]] ...\n", argv[0]);
+				fprintf(stderr, "usage: %s [-h] [-o <output file>] [-f <input file> -d <load address> -t [kernel|bootlogo|binload|initrd|cmdline|arc] [-i <arc index>]] ...\n", argv[0]);
 				return 1;
 		}
 	}
