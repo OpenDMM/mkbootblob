@@ -24,6 +24,7 @@ struct list_entry {
 };
 
 static struct list_entry *entire_list;
+static uint32_t memory_size;
 
 static bool get_filelength(char *filename, off_t *len)
 {
@@ -38,7 +39,7 @@ static bool get_filelength(char *filename, off_t *len)
 
 static bool validate_list(void)
 {
-	struct list_entry *element;
+	struct list_entry *element, *e1, *e2;
 	const char *type_lut[] = {"", "kernel ", " logo  ", "binload", "initrd ", "cmdline", "", "", "  arc  "};
 	static uint32_t lba_pos = 1;	//first block is for content-list
 
@@ -73,11 +74,28 @@ static bool validate_list(void)
 		element->lba_pos = lba_pos;
 		element->lba_len = filelen / 512;
 
+		/* If no destination address was given, allocate from the end of available memory */
+		assert(element->dest_addr != 0 || memory_size >= element->image_len);
+		if (element->dest_addr == 0) {
+			element->dest_addr = memory_size - element->image_len;
+			memory_size = element->dest_addr;
+		}
+
 		lba_pos += element->lba_len;
 
 		printf(" 0x%08x | %10d | %8d | %7d | %s | %s\n", element->dest_addr, element->image_len, element->lba_pos, element->lba_len, type_lut[element->type], element->filename);
 	}
 	printf("\n");
+
+	for (e1 = entire_list; e1 != NULL; e1 = e1->next) {
+		for (e2 = e1->next; e2 != NULL; e2 = e2->next) {
+			if (!((e1->dest_addr < e2->dest_addr && e1->dest_addr + e1->image_len <= e2->dest_addr) ||
+			      (e2->dest_addr < e1->dest_addr && e2->dest_addr + e2->image_len <= e1->dest_addr))) {
+				fprintf(stderr, "There's a conflict between two or more elements!\n");
+				return false;
+			}
+		}
+	}
 
 	return true;
 }
@@ -95,10 +113,10 @@ int main(int argc, char **argv)
 	uint32_t wp;
 	
 
-	while ((c = getopt(argc, argv, "d:f:hi:o:t:")) != -1) {
+	while ((c = getopt(argc, argv, "d:f:hi:m:o:t:")) != -1) {
 		switch(c) {
 			case 'd':
-				element->dest_addr = strtol(optarg, NULL, 16);
+				element->dest_addr = strtoul(optarg, NULL, 0);
 				break;
 			case 'f':
 				last_element = element;
@@ -111,7 +129,10 @@ int main(int argc, char **argv)
 				strncpy(element->filename, optarg, FILENAME_MAX);
 				break;
 			case 'i':
-				element->arc_index = strtol(optarg, NULL, 16);
+				element->arc_index = strtoul(optarg, NULL, 0);
+				break;
+			case 'm':
+				memory_size = strtoul(optarg, NULL, 0);
 				break;
 			case 'o':
 				output_filename = optarg;
