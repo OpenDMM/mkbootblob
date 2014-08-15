@@ -30,8 +30,10 @@ static bool get_filelength(char *filename, off_t *len)
 {
 	struct stat st;
 
-	if(stat(filename, &st) != 0)
+	if (stat(filename, &st) != 0) {
+		perror(filename);
 		return false;
+	}
 
 	*len = st.st_size;
 	return true;
@@ -159,7 +161,7 @@ int main(int argc, char **argv)
 	}
 
 	if (!validate_list()) {
-		fprintf(stderr, "vaildation of elements failed\n");
+		fprintf(stderr, "validation of elements failed\n");
 		return 1;
 	}
 
